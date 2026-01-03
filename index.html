@@ -1,0 +1,1893 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Life Navigation" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+<title>ロゴダイナミック実存主義 Life Navigation Toolkit（完全オフライン版）</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --card:#111f36;
+      --text:#e6edf7;
+      --muted:#a9b7d0;
+      --line:rgba(255,255,255,.10);
+      --accent:#5aa3ff;
+      --accent2:#7ee0a3;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+      background: radial-gradient(1200px 500px at 20% -10%, rgba(90,163,255,.18), transparent 60%),
+                  radial-gradient(900px 400px at 90% 10%, rgba(126,224,163,.14), transparent 60%),
+                  linear-gradient(180deg, var(--bg), #070b13 90%);
+      color:var(--text);
+      min-height:100vh;
+    }
+    a{color:var(--accent)}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 16px 90px}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 16px;border:1px solid var(--line);border-radius:24px;
+      background: rgba(17,31,54,.65);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position:sticky;top:12px;z-index:10;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:42px;height:42px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(90,163,255,.9), rgba(126,224,163,.85));
+      display:grid;place-items:center;color:#071225;font-weight:900;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+    }
+    .title{line-height:1.1}
+    .title h1{font-size:16px;margin:0 0 2px}
+    .title p{margin:0;color:var(--muted);font-size:12px}
+    .pill{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);padding:8px 10px;border-radius:999px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .grid{display:grid;gap:14px}
+    .cards{grid-template-columns: repeat(12,1fr)}
+    .card{
+      border:1px solid var(--line);
+      background: rgba(17,31,54,.72);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{margin:0 0 8px;font-size:18px}
+    .card p{margin:0;color:var(--muted);line-height:1.7}
+    .btn{
+      appearance:none;border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      padding:10px 12px;border-radius:14px;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      font-weight:700;
+    }
+    .btn:hover{background: rgba(255,255,255,.08)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{background: rgba(90,163,255,.18);border-color: rgba(90,163,255,.45)}
+    .btn.primary:hover{background: rgba(90,163,255,.24)}
+    .btn.green{background: rgba(126,224,163,.16);border-color: rgba(126,224,163,.40)}
+    .btn.green:hover{background: rgba(126,224,163,.22)}
+    .btn.danger{background: rgba(255,107,107,.14);border-color: rgba(255,107,107,.42)}
+    .btn.danger:hover{background: rgba(255,107,107,.20)}
+    .btn.ghost{background: transparent}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .muted{color:var(--muted)}
+    .sep{height:1px;background:var(--line);margin:14px 0}
+    .nav{
+      position:fixed;left:0;right:0;bottom:0;
+      background: rgba(9,14,25,.78);
+      backdrop-filter: blur(10px);
+      border-top:1px solid var(--line);
+      padding:10px 10px;
+      z-index:20;
+    }
+    .nav .inner{max-width:980px;margin:0 auto;display:flex;gap:8px}
+    .tab{
+      flex:1;min-width:0;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:800;
+      cursor:pointer;
+      display:flex;justify-content:center;align-items:center;gap:8px;
+    }
+    .tab.active{
+      color:var(--text);
+      background: rgba(90,163,255,.18);
+      border-color: rgba(90,163,255,.45);
+    }
+    .kpi{
+      display:grid;grid-template-columns: repeat(3,1fr);gap:10px;
+      margin-top:12px;
+    }
+    .kpi .mini{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:10px 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .mini .n{font-size:18px;font-weight:900;margin:0}
+    .mini .l{font-size:12px;color:var(--muted);margin:2px 0 0}
+    .stepbar{
+      height:10px;border-radius:999px;background: rgba(255,255,255,.08);
+      overflow:hidden;border:1px solid var(--line);
+    }
+    .stepbar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(90,163,255,.9), rgba(126,224,163,.85));
+      transition: width .25s ease;
+    }
+    .stepgrid{display:grid;grid-template-columns: repeat(7,1fr);gap:8px}
+    .stepbtn{
+      padding:10px 8px;border-radius:14px;border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:900;
+      cursor:pointer;
+      text-align:center;
+      line-height:1.2;
+    }
+    .stepbtn small{display:block;font-weight:700;color:var(--muted);opacity:.9;margin-top:4px}
+    .stepbtn.active{color:var(--text);border-color: rgba(90,163,255,.45);background: rgba(90,163,255,.14)}
+    .stepbtn.done{border-color: rgba(126,224,163,.38);background: rgba(126,224,163,.10)}
+    textarea,input[type="text"]{
+      width:100%;
+      border-radius: 16px;
+      padding:12px 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      outline:none;
+      line-height:1.6;
+    }
+    textarea{min-height:110px;resize: vertical}
+    label{font-size:12px;color:var(--muted);font-weight:900;display:block;margin:0 0 6px}
+    .chip{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      padding:8px 10px;border-radius:999px;
+      color:var(--muted);
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.active{color:var(--text);border-color: rgba(90,163,255,.45);background: rgba(90,163,255,.14)}
+    .range{
+      display:flex;gap:10px;align-items:center
+    }
+    input[type="range"]{width:100%}
+    .notice{
+      border:1px solid rgba(255,204,102,.35);
+      background: rgba(255,204,102,.10);
+      border-radius: 18px;
+      padding:12px 12px;
+      color: rgba(255,235,200,.92);
+      line-height:1.65;
+      font-size:13px;
+    }
+    details{
+      border:1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.03);
+      padding:12px 12px;
+    }
+    summary{cursor:pointer;font-weight:900}
+    .logcard{display:grid;gap:10px}
+    .badge{
+      font-size:11px;color:var(--muted);
+      border:1px solid var(--line);padding:6px 8px;border-radius:999px;
+      display:inline-flex;gap:8px;align-items:center;
+    }
+    .right{margin-left:auto}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .footerq{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
+  
+    /* PWA install banner */
+    .installBanner{
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      margin: 10px 0 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(17,31,54,.92);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content: space-between;
+    }
+    .installBanner .msg{
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .installBanner .msg b{color:#fff}
+    .installBanner .actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .installBanner .btn{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(90,163,255,.16);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .installBanner .btn.secondary{
+      background: rgba(255,255,255,.06);
+      font-weight: 600;
+    }
+    .installBanner.hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">⛵</div>
+        <div class="title">
+          <h1>ロゴダイナミック実存主義 Life Navigation Toolkit</h1>
+          <p>完全オフライン版（ブラウザのみ・保存は端末内）</p>
+        </div>
+      </div>
+      <div class="pill" id="statusPill">🟢 オフライン動作</div>
+    </header>
+
+    
+    <div id="installBanner" class="installBanner hidden" role="status" aria-live="polite">
+      <div class="msg" id="installMsg">
+        📲 このツールを <b>ホーム画面に追加</b> すると、アプリのように起動できます。
+      </div>
+      <div class="actions">
+        <button class="btn" id="installBtn" type="button">インストール</button>
+        <button class="btn secondary" id="installHelpBtn" type="button">手順</button>
+        <button class="btn secondary" id="installCloseBtn" type="button">×</button>
+      </div>
+    </div>
+<main id="view"></main>
+
+    <div class="footerq">「航海は技法ではない。運用である。回転数が、人生を変える。」</div>
+  </div>
+
+  <nav class="nav">
+    <div class="inner">
+      <button class="tab active" data-tab="home">🏠 ホーム</button>
+      <button class="tab" data-tab="engine">🧭 エンジン</button>
+      <button class="tab" data-tab="history">📒 日誌</button>
+      <button class="tab" data-tab="training">🏋️ 訓練</button>
+      <button class="tab" data-tab="theory">📘 理論</button>
+    </div>
+  </nav>
+
+<script>
+(() => {
+  const STEPS = [
+    { title: '停船', desc: 'いまを固定する。深呼吸を1回。' },
+    { title: '海図', desc: '事実と解釈を分ける。' },
+    { title: '風', desc: '感情・体調を「風」として読む。' },
+    { title: '羅針盤', desc: '良心（誠実な北）を問いかける。' },
+    { title: '操舵', desc: '1%の行動を確定する。' },
+    { title: '実行', desc: 'タイマーをセットして1%だけ。' },
+    { title: '日誌', desc: '回転を上げる振り返り。' }
+  ];
+
+  const WIND_TYPES = ['虚無・無気力','不安','怒り','焦り','疲労','迷い','先延ばし','安定'];
+  const MODES = ['A運用（超安全・救命艇）','B運用（標準・巡航）','C運用（挑戦・加速）'];
+
+
+  // --- 職場向け（個人用）プロファイル：業種×職種×KPI/リスク（オフライン内蔵） ---
+  const INDUSTRIES = [
+    'IT/ソフトウェア','製造','医療・介護','金融','小売/EC','教育','公共/行政','建設','物流','サービス','その他'
+  ];
+  const JOB_FUNCTIONS = [
+    '営業','カスタマーサポート/CS','採用/人事','法務/コンプラ','製造/現場','開発/エンジニア',
+    'マーケ/広報','経理/財務','購買/調達','PM/企画','品質保証/QA','マネージャー/管理職','その他'
+  ];
+
+  const INDUSTRY_KPI_RISK = {
+    'IT/ソフトウェア': {
+      kpis: ['ARR/売上','継続率（解約率）','NPS/顧客満足','稼働率/可用性','納期遵守','開発速度/品質'],
+      risks: ['情報漏えい','障害/ダウンタイム','過剰な残業・燃え尽き','炎上（SNS/顧客）','仕様変更の連鎖']
+    },
+    '製造': {
+      kpis: ['品質（不良率）','安全（災害ゼロ）','歩留まり','生産性','納期遵守','コスト'],
+      risks: ['労災・安全事故','品質逸脱','設備停止','偽装・コンプラ違反','サプライ断絶']
+    },
+    '医療・介護': {
+      kpis: ['安全（事故ゼロ）','ケア品質','患者/利用者満足','稼働（人員配置）','記録の正確性'],
+      risks: ['医療事故/インシデント','虐待・倫理リスク','感染症','離職・疲弊','個人情報漏えい']
+    },
+    '金融': {
+      kpis: ['収益','顧客維持','審査品質','不正検知','監査指摘ゼロ','問い合わせ応答品質'],
+      risks: ['不正/詐欺','コンプラ違反','情報漏えい','風評','過度な販売圧力']
+    },
+    '小売/EC': {
+      kpis: ['売上','粗利','回転率','欠品率','返品率','CS満足'],
+      risks: ['クレーム炎上','在庫不一致','物流遅延','個人情報漏えい','不正注文']
+    },
+    '教育': {
+      kpis: ['学習成果','継続率','満足度','授業品質','運営安定'],
+      risks: ['ハラスメント','炎上','不登校/離脱','個人情報漏えい','過重負担']
+    },
+    '公共/行政': {
+      kpis: ['法令遵守','住民満足','処理の正確性','納期/期限遵守','透明性'],
+      risks: ['手続きミス','情報漏えい','不正','炎上','過重負担']
+    },
+    '建設': {
+      kpis: ['安全（災害ゼロ）','品質','工期遵守','原価','協力会社連携'],
+      risks: ['労災','工期遅延','品質不良','法令違反','天候・災害']
+    },
+    '物流': {
+      kpis: ['納期遵守','誤配送率','稼働率','コスト','事故ゼロ'],
+      risks: ['事故','遅延','過労','クレーム','盗難']
+    },
+    'サービス': {
+      kpis: ['満足度','再来店/継続','生産性','応対品質','売上'],
+      risks: ['クレーム','炎上','離職','ハラスメント','過重負担']
+    },
+    'その他': { kpis: ['成果','品質','期限遵守','満足度'], risks: ['過重負担','対人摩擦','炎上'] }
+  };
+
+  const JOB_KIND_KPI_RISK = {
+    '営業': { kpis: ['商談数','受注率','売上','単価','更新率'], risks: ['不適切販売','過度なプレッシャー','関係悪化','情報管理'] },
+    'カスタマーサポート/CS': { kpis: ['一次解決率','応答速度','CSAT','解約抑止'], risks: ['感情労働の消耗','クレーム誘発','情報漏えい','燃え尽き'] },
+    '採用/人事': { kpis: ['採用充足','定着率','エンゲージメント','制度運用の公平性'], risks: ['ハラスメント','不公平感','機密漏えい','過重負担'] },
+    '法務/コンプラ': { kpis: ['リーガルリスク低減','契約リードタイム','監査指摘ゼロ'], risks: ['重大違反','不正','炎上','属人化'] },
+    '製造/現場': { kpis: ['安全','品質','生産性','段取り'], risks: ['労災','ヒヤリハット','手順逸脱','疲労'] },
+    '開発/エンジニア': { kpis: ['品質','速度','可用性','保守性'], risks: ['障害','燃え尽き','技術負債','セキュリティ'] },
+    'マーケ/広報': { kpis: ['リード','CVR','CPA','ブランド指標'], risks: ['炎上','誇大表現','個人情報','疲弊'] },
+    '経理/財務': { kpis: ['締めの正確性','キャッシュ','監査対応'], risks: ['誤計上','不正','締め過重','属人化'] },
+    '購買/調達': { kpis: ['コスト','納期','品質','供給安定'], risks: ['サプライ断絶','不正','品質事故','交渉摩擦'] },
+    'PM/企画': { kpis: ['納期','価値提供','合意形成','リスク管理'], risks: ['仕様爆発','対立','過重負担','炎上'] },
+    '品質保証/QA': { kpis: ['欠陥流出ゼロ','テスト網羅','再発防止'], risks: ['リリース圧力','責任過多','燃え尽き'] },
+    'マネージャー/管理職': { kpis: ['チーム成果','定着','育成','心理的安全性'], risks: ['孤立','板挟み','ハラスメント','過労'] },
+    'その他': { kpis: [], risks: [] }
+  };
+
+  function uniq(arr){
+    const s = new Set();
+    const out = [];
+    (arr||[]).forEach(x => { if (!x) return; const k=String(x).trim(); if(!k) return; if(!s.has(k)){s.add(k); out.push(k);} });
+    return out;
+  }
+
+  function deriveKpiRisk(industry, jobFunction){
+    const base = INDUSTRY_KPI_RISK[industry] || INDUSTRY_KPI_RISK['その他'];
+    const job = JOB_KIND_KPI_RISK[jobFunction] || JOB_KIND_KPI_RISK['その他'];
+    const kpis = uniq([...(base.kpis||[]), ...(job.kpis||[])]);
+    const risks = uniq([...(base.risks||[]), ...(job.risks||[])]);
+    return { kpis, risks };
+  }
+
+  function inferUserTierFromRole(role){
+    const r = String(role || '').trim().toLowerCase();
+    if (!r) return 'general';
+    const isExec = /役員|取締役|執行|ceo|coo|cfo|cto|社長|本部長|統括|vp|head/.test(r);
+    if (isExec) return 'executive';
+    const isMgr = /部長|課長|係長|マネ|manager|lead|リーダ|主任/.test(r);
+    if (isMgr) return 'manager';
+    return 'general';
+  }
+
+  function resolveUserTier(){
+    const t = String(state.workProfile.userTier || 'auto');
+    if (t === 'auto') return inferUserTierFromRole(state.workProfile.role);
+    if (t === 'executive' || t === 'manager' || t === 'general') return t;
+    return 'general';
+  }
+
+  function userTierLabel(t){
+    if (t === 'executive') return '役職者（部長/役員）';
+    if (t === 'manager') return '管理者（マネージャー）';
+    return '一般（個人/現場）';
+  }
+
+  // --- 利用者区分別Q&A（職場ログの運用ヒント） ---
+  const TIER_FAQ_COMMON = [
+    {
+      q: 'Q. 何を書けばいいか迷います。',
+      a: 'A. 最短は「状況（事実）→ 1%行動」だけでOKです。余力があれば、意味（学び）と態度（どう在るか）を1行ずつ足してください。'
+    },
+    {
+      q: 'Q. 忙しくて続きません。',
+      a: 'A. 1分で終わる形に落とします。全部埋める必要はありません。“完璧”より“継続”。'
+    },
+    {
+      q: 'Q. 個人情報/機密が心配です。',
+      a: 'A. 個人名/顧客名/案件名などは書かず、「関係者」「案件」のように抽象化してください。'
+    },
+    {
+      q: 'Q. 書いていてしんどくなります。',
+      a: 'A. 中止サインです。深呼吸→水分→安全な行動へ切り替え、「今日はここまで」も訓練。必要なら専門家に相談してください。'
+    }
+  ];
+
+  const TIER_FAQ_BY_TIER = {
+    general: [
+      {
+        q: 'Q. ネガティブなことしか出てきません。',
+        a: 'A. 事実と評価を分けます（何が起きた／どう感じた）。次に「それでも守りたい価値は？」を1つだけ書くと、態度価値が立ち上がります。'
+      },
+      {
+        q: 'Q. “意味”が見つかりません。',
+        a: 'A. 大きな結論でなくてOKです。「学び」「次に改善できる点」「誰かの役に立った点」を1つ見つければ十分です。'
+      },
+      {
+        q: 'Q. 50%チャレンジが怖いです。',
+        a: 'A. 50%は“無謀”ではなく“小さなリスク”。失敗しても致命的でない範囲に設計し、週1回からにします。'
+      }
+    ],
+    manager: [
+      {
+        q: 'Q. 部下にもやらせるべきですか？',
+        a: 'A. 強制は逆効果です。まずは管理者が自分のログで安全な運用を示し、希望者が任意で試せる形（評価に使わない明文化）にしてください。'
+      },
+      {
+        q: 'Q. 1on1でどう使えばいいですか？',
+        a: 'A. 原文ログの提出は求めず、「1%行動」「守りたい価値」「中止サイン」だけを本人の言葉で共有する方式が安全です。'
+      },
+      {
+        q: 'Q. 不調サインが見えたら？',
+        a: 'A. 休息/負荷調整/専門窓口へつなぐ判断が最優先です。ログは診断ではなく“気づきの補助”として扱います。'
+      }
+    ],
+    executive: [
+      {
+        q: 'Q. 経営としての使いどころは？',
+        a: 'A. 匿名の傾向から、現場の詰まり（負荷・恐怖・過剰順守）を兆候として把握し、資源配分や制度設計の意思決定に接続できます。'
+      },
+      {
+        q: 'Q. 評価制度と混ぜても大丈夫？',
+        a: 'A. 原則は分離が安全です。評価に直結すると自己検閲が起きます。必要なら専門家と運用設計をしてください。'
+      },
+      {
+        q: 'Q. 導入時の事故（炎上/不信）を避けるには？',
+        a: 'A. ①評価に使わない ②個人情報を書かない ③中止サイン/相談導線 ④データ最小化（タグ中心）を明文化し、社内の言い回しに合わせて合意形成します。'
+      }
+    ]
+  };
+
+  function renderTierFaqHtml(){
+    const eff = resolveUserTier();
+    const items = [...TIER_FAQ_COMMON, ...((TIER_FAQ_BY_TIER[eff] || []) )];
+    return items.map(it => `
+      <details class="card" style="background:rgba(255,255,255,.03)">
+        <summary><b>${esc(it.q)}</b></summary>
+        <div class="sep"></div>
+        <div class="muted">${esc(it.a)}</div>
+      </details>
+    `).join('');
+  }
+
+  const LS_LOGS = 'lde_logs_v1';
+  const LS_DRAFT = 'lde_draft_v1';
+  const LS_WORK_PROFILE = 'lde_work_profile_v1';
+
+  const $ = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
+  const view = $('#view');
+
+  const state = {
+    tab: 'home',
+    step: 0,
+    mode: 'A運用（超安全・救命艇）',
+    draft: {
+      date: '',
+      mode: 'A運用（超安全・救命艇）',
+      externalFeedback: '',
+      reflection: '',
+      windType: '安定',
+      windForce: 3,
+      compass: '',
+      action1Percent: '',
+      internalFeedback: '',
+      nextStep: ''
+    },
+    workProfile: {
+      orgName: '',
+      industry: '',
+      department: '',
+      role: '',
+      jobFunction: '',
+      userTier: 'auto',
+      kpiText: '',
+      riskText: ''
+    },
+    logs: []
+  };
+
+  function nowJP() {
+    try { return new Date().toLocaleString('ja-JP'); }
+    catch { return new Date().toISOString(); }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(LS_LOGS);
+      state.logs = raw ? JSON.parse(raw) : [];
+    } catch { state.logs = []; }
+
+    try {
+      const raw = localStorage.getItem(LS_DRAFT);
+      if (raw) state.draft = Object.assign(state.draft, JSON.parse(raw));
+    } catch {}
+
+    try {
+      const raw = localStorage.getItem(LS_WORK_PROFILE);
+      if (raw) state.workProfile = Object.assign(state.workProfile, JSON.parse(raw));
+    } catch {}
+  }
+
+  function persistProfile(){
+    localStorage.setItem(LS_WORK_PROFILE, JSON.stringify(state.workProfile));
+  }
+
+  function persist() {
+    localStorage.setItem(LS_LOGS, JSON.stringify(state.logs));
+  }
+  function persistDraft() {
+    localStorage.setItem(LS_DRAFT, JSON.stringify(state.draft));
+  }
+
+  function setTab(tab) {
+    state.tab = tab;
+    $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    render();
+  }
+
+  function setStep(i) {
+    state.step = Math.max(0, Math.min(6, i));
+    persistDraft();
+    render();
+  }
+
+  function resetDraft() {
+    state.step = 0;
+    state.draft = {
+      date: '',
+      mode: state.mode,
+      externalFeedback: '',
+      reflection: '',
+      windType: '安定',
+      windForce: 3,
+      compass: '',
+      action1Percent: '',
+      internalFeedback: '',
+      nextStep: ''
+    };
+    persistDraft();
+  }
+
+  function saveLog() {
+    const d = state.draft;
+    const id = String(Date.now());
+    const entry = {
+      id,
+      date: d.date || nowJP(),
+      mode: d.mode || state.mode,
+      externalFeedback: d.externalFeedback || '',
+      reflection: d.reflection || '',
+      windType: d.windType || '',
+      windForce: Number.isFinite(d.windForce) ? d.windForce : 0,
+      compass: d.compass || '',
+      action1Percent: d.action1Percent || '',
+      internalFeedback: d.internalFeedback || '',
+      nextStep: d.nextStep || ''
+    };
+    state.logs.unshift(entry);
+    persist();
+    resetDraft();
+    alert('航海日誌に記録しました。');
+    setTab('history');
+  }
+
+  function deleteLog(id) {
+    if (!confirm('この記録を削除しますか？')) return;
+    state.logs = state.logs.filter(x => x.id !== id);
+    persist();
+    render();
+  }
+
+  function deleteAllLogs() {
+    if (!confirm('すべての航海日誌を削除しますか？（元に戻せません）')) return;
+    state.logs = [];
+    persist();
+    render();
+  }
+
+  function exportLogs() {
+    const blob = new Blob([JSON.stringify({version:1, exportedAt: nowJP(), logs: state.logs}, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lde_logs_export.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importLogs(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        const logs = Array.isArray(data.logs) ? data.logs : (Array.isArray(data) ? data : null);
+        if (!logs) throw new Error('形式が不正です');
+        // merge by id
+        const map = new Map(state.logs.map(x => [x.id, x]));
+        for (const e of logs) {
+          if (e && e.id && !map.has(e.id)) map.set(e.id, e);
+        }
+        state.logs = [...map.values()].sort((a,b)=> String(b.id).localeCompare(String(a.id)));
+        persist();
+        alert('インポートしました。');
+        render();
+      } catch (e) {
+        alert('インポートに失敗しました：' + ((e && e.message) || e));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function esc(s){ return ((s !== null && s !== undefined) ? s : '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function renderHome() {
+    const total = state.logs.length;
+    const last = (state.logs[0] && state.logs[0].date) ? state.logs[0].date : '未記録';
+    const streak = calcStreak(state.logs);
+
+    return `
+      <section class="card">
+        <h2>ホーム</h2>
+        <p>このツールは <b>完全オフライン</b> で動きます。記録はあなたの端末内（localStorage）に保存されます。</p>
+
+        <div class="kpi">
+          <div class="mini"><p class="n">${total}</p><p class="l">記録数</p></div>
+          <div class="mini"><p class="n">${streak}</p><p class="l">連続日数（簡易）</p></div>
+          <div class="mini"><p class="n">${esc(last)}</p><p class="l">最新の記録</p></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <button class="btn primary" id="startEngine">🧭 エンジンを回す</button>
+          <button class="btn ghost" id="goHistory">📒 日誌を見る</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <span class="badge">⚙️ 運用モード</span>
+          ${MODES.map(m => `<button class="chip ${state.mode===m?'active':''}" data-mode="${esc(m)}">${esc(m.split('（')[0])}</button>`).join('')}
+          <span class="muted" style="font-size:12px">（おすすめ：まずはA運用）</span>
+        </div>
+
+        <div class="notice" style="margin-top:12px">
+          <b>ヒント：</b>「完璧に解決」ではなく「航路復帰」が目的です。<br/>
+          1%の舵（小さく、安全で、今日の自分でもできる）で回転数を上げます。
+        </div>
+      </section>
+    `;
+  }
+
+  function calcStreak(logs){
+    // very simple streak: count unique dates (YYYY/MM/DD) from newest backwards
+    if (!logs.length) return 0;
+    const dates = logs.map(x => normalizeDateKey(x.date)).filter(Boolean);
+    const uniq = [];
+    for (const d of dates) if (!uniq.includes(d)) uniq.push(d);
+    if (!uniq.length) return 0;
+    let streak = 1;
+    for (let i=1;i<uniq.length;i++){
+      const prev = new Date(uniq[i-1]);
+      const cur  = new Date(uniq[i]);
+      const diff = Math.round((prev - cur)/(1000*60*60*24));
+      if (diff===1) streak++;
+      else break;
+    }
+    return streak;
+  }
+  function normalizeDateKey(s){
+    // try to extract date portion and convert to YYYY-MM-DD
+    if (!s) return null;
+    // ISO
+    const m1 = String(s).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (!m1) return null;
+    const y = m1[1], mo = String(m1[2]).padStart(2,'0'), d = String(m1[3]).padStart(2,'0');
+    return `${y}-${mo}-${d}`;
+  }
+
+  function renderEngine() {
+    const d = state.draft;
+    const pct = Math.round((state.step)/6*100);
+
+    const stepButtons = STEPS.map((s, i) => {
+      const cls = i===state.step ? 'active' : (i<state.step ? 'done' : '');
+      return `<button class="stepbtn ${cls}" data-step="${i}">
+        ${esc(s.title)}<small>${esc(s.desc)}</small>
+      </button>`;
+    }).join('');
+
+    return `
+      <section class="card">
+        <div class="row">
+          <h2 style="margin:0">エンジン（7ステップ）</h2>
+          <span class="right badge">🕰 ${esc(d.date || '未記録')}</span>
+        </div>
+        <p>「停船→海図→風→羅針盤→操舵→実行→日誌」</p>
+
+        <div class="stepbar" aria-label="progress"><div style="width:${pct}%"></div></div>
+
+        <div class="sep"></div>
+
+        <div class="stepgrid">${stepButtons}</div>
+
+        <div class="sep"></div>
+
+        ${renderStepBody()}
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <button class="btn" id="prevStep">← 戻る</button>
+          <button class="btn primary" id="nextStep">次へ →</button>
+          <button class="btn ghost right" id="resetDraft">やり直す</button>
+        </div>
+      </section>
+    `;
+
+    function renderStepBody(){
+      switch(state.step){
+        case 0:
+          return `
+            <div class="grid">
+              <div class="notice">
+                <b>停船：</b>いまを固定します。深呼吸を1回。<br/>
+                「この瞬間に私は、応答できる」という前提に戻ります。
+              </div>
+              <div class="row">
+                <span class="badge">⚙️ 運用モード</span>
+                ${MODES.map(m => `<button class="chip ${d.mode===m?'active':''}" data-mode2="${esc(m)}">${esc(m.split('（')[0])}</button>`).join('')}
+              </div>
+              <div>
+                <label>日時（任意）</label>
+                <input type="text" id="dateInput" placeholder="例：${nowJP()}" value="${esc(d.date)}" />
+              </div>
+              <div class="row">
+                <button class="btn green" id="fillNow">今の日時を入れる</button>
+                <button class="btn primary" id="okReady">準備OK</button>
+              </div>
+            </div>
+          `;
+        case 1:
+          return `
+            <div class="grid">
+              <div>
+                <label>存在（今日の今の現実）＝事実（観測できるもの）</label>
+                <textarea id="ext" placeholder="何が起きた？（いつ/どこで/誰が）">${esc(d.externalFeedback)}</textarea>
+              </div>
+              <div>
+                <label>解釈（頭の中の物語）</label>
+                <textarea id="ref" placeholder="どう意味づけた？どんな不安や怒りが出た？">${esc(d.reflection)}</textarea>
+              </div>
+              <div class="notice"><b>コツ：</b>事実と解釈が分かれただけで、操舵は始まっています。</div>
+            </div>
+          `;
+        case 2:
+          return `
+            <div class="grid">
+              <div>
+                <label>いまの「風」の種類</label>
+                <div class="row">
+                  ${WIND_TYPES.map(t => `<button class="chip ${d.windType===t?'active':''}" data-wind="${esc(t)}">${esc(t)}</button>`).join('')}
+                </div>
+              </div>
+              <div>
+                <div class="row" style="justify-content:space-between">
+                  <label style="margin:0">風力（強さ）：<b>${Number(d.windForce)||0}</b></label>
+                  <span class="muted" style="font-size:12px">0: 凪 〜 10: 嵐</span>
+                </div>
+                <div class="range">
+                  <input type="range" min="0" max="10" value="${Number(d.windForce)||0}" id="windForce" />
+                </div>
+              </div>
+              <div class="notice"><b>読み替え：</b>感情や体調は「風」。否定せず、読み取って航路調整に使います。</div>
+            </div>
+          `;
+        case 3:
+          return `
+            <div class="grid">
+              <div>
+                <label>羅針盤への最短質問（押してコピペ用）</label>
+                <div class="row">
+                  ${[
+                    'いま、最も誠実な一手は？',
+                    'この状況で、私は誰に対して責任を持ちたい？',
+                    '5年後の私が誇れるのはどっち？',
+                    'ここで私が守るべき「人間としての品位」は何？'
+                  ].map(q => `<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
+                </div>
+              </div>
+              <div>
+                <label>羅針盤メモ（良心/北）</label>
+                <textarea id="comp" placeholder="答えや方向性をメモ...">${esc(d.compass)}</textarea>
+              </div>
+              <div class="notice">
+                <b>ポイント：</b>ここで「当為（しなければならない事柄）」が整いはじめます。まだ曖昧でもOK。
+              </div>
+            </div>
+          `;
+        case 4:
+          return `
+            <div class="grid">
+              <div class="notice">
+                <b>今日の1%行動（最小・安全・確実）</b><br/>
+                ・最小：2〜15分でできる　・安全：生活を壊さない　・確実：今日の自分でもできる
+              </div>
+              <div>
+                <label>1%行動</label>
+                <textarea id="act" placeholder="例：机の上を2分だけ片付ける / 謝罪の連絡を一文だけ書く">${esc(d.action1Percent)}</textarea>
+              </div>
+              <div class="notice"><b>合言葉：</b>完璧より「航路復帰」。</div>
+            </div>
+          `;
+        case 5:
+          return `
+            <div class="grid">
+              <div class="notice">
+                <b>実行フェーズ</b><br/>
+                ここは「理屈」ではなく「1%だけやる」です。タイマーを2〜15分に。
+              </div>
+              <div class="card" style="background:rgba(255,255,255,.03)">
+                <div class="row">
+                  <span class="badge">🧩 今日の1%行動</span>
+                </div>
+                <p style="margin-top:8px;color:var(--text)"><b>${esc(d.action1Percent||'未入力')}</b></p>
+              </div>
+              <div class="row">
+                <button class="btn green" id="copyAction">行動をコピー</button>
+              </div>
+            </div>
+          `;
+        case 6:
+          return `
+            <div class="grid">
+              <div>
+                <label>内的反応（胸の反応）</label>
+                <input type="text" id="infb" placeholder="納得/違和感/罪悪感/誇り..." value="${esc(d.internalFeedback)}" />
+              </div>
+              <div>
+                <label>次の微調整（次の一手）</label>
+                <textarea id="next" placeholder="次はこう直す / 少し上げる / 少し下げる...">${esc(d.nextStep)}</textarea>
+              </div>
+              <button class="btn primary" id="saveLog">📒 航海日誌に記録して完了</button>
+              <div class="notice">
+                <b>意味は行動のあとに立ち上がる。</b><br/>
+                今日の「応答」が、次の自分の航路を作ります。
+              </div>
+            </div>
+          `;
+      }
+    }
+  }
+
+  function renderHistory() {
+    if (!state.logs.length) {
+      return `
+        <section class="card">
+          <h2>航海日誌</h2>
+          <p>航海日誌はまだありません。エンジンを回して、最初の一歩を記録しましょう。</p>
+          <div class="sep"></div>
+          <button class="btn primary" id="startFromHistory">🧭 エンジンを回す</button>
+        </section>
+      `;
+    }
+
+    const cards = state.logs.map((l) => {
+
+      if (l && l.type === 'workplace') return `
+      <details class="logcard">
+        <summary>
+          <span class="badge">🗓 ${esc(l.date)}</span>
+          <span class="badge">🏢 職場</span>
+          <span class="badge">${esc(l.industry||'')}</span>
+          <span class="badge">${esc(l.jobFunction||'')}</span>
+          <span class="badge">${esc(l.work||'')}</span>
+        </summary>
+        <div class="sep"></div>
+        <div class="mono" style="white-space:pre-wrap">${esc(l.body || '—')}</div>
+        <div class="sep"></div>
+        <button class="btn danger" data-del="${esc(l.id)}">🗑 削除</button>
+      </details>
+      `;
+
+      if (l && l.type === 'training') return `
+      <details class="logcard">
+        <summary>
+          <span class="badge">🗓 ${esc(l.date)}</span>
+          <span class="badge">🏋️ 訓練</span>
+          <span class="badge">${esc(l.pillar||'')}</span>
+          <span class="badge">${esc(l.work||'')}</span>
+        </summary>
+        <div class="sep"></div>
+        <div class="mono" style="white-space:pre-wrap">${esc(l.body || '—')}</div>
+        <div class="sep"></div>
+        <button class="btn danger" data-del="${esc(l.id)}">🗑 削除</button>
+      </details>
+      `;
+      return `
+      <details class="logcard">
+        <summary>
+          <span class="badge">🗓 ${esc(l.date)}</span>
+          <span class="badge">⚙️ ${esc((l.mode||'').split('（')[0] || 'A')}</span>
+          <span class="badge">🌬 ${esc(l.windType||'')}</span>
+          <span class="badge">💨 ${esc(String(((l.windForce !== null && l.windForce !== undefined) ? l.windForce : '')))}</span>
+        </summary>
+        <div class="sep"></div>
+        <div class="grid">
+          <div>
+            <label>事実（観測）</label>
+            <div class="muted">${esc(l.externalFeedback || '—')}</div>
+          </div>
+          <div>
+            <label>解釈（物語）</label>
+            <div class="muted">${esc(l.reflection || '—')}</div>
+          </div>
+          <div>
+            <label>羅針盤（良心/北）</label>
+            <div class="muted">「${esc(l.compass || '—')}」</div>
+          </div>
+          <div>
+            <label>1%行動</label>
+            <div class="muted"><b>${esc(l.action1Percent || '—')}</b></div>
+          </div>
+          <div>
+            <label>内的反応</label>
+            <div class="muted">${esc(l.internalFeedback || '—')}</div>
+          </div>
+          <div>
+            <label>次の微調整</label>
+            <div class="muted">${esc(l.nextStep || '—')}</div>
+          </div>
+          <div class="row">
+            <button class="btn danger" data-del="${esc(l.id)}">削除</button>
+          </div>
+        </div>
+      </details>
+    `;
+    }).join('');
+
+    return `
+      <section class="card">
+        <div class="row">
+          <h2 style="margin:0">航海日誌</h2>
+          <span class="right badge">件数：${state.logs.length}</span>
+        </div>
+        <p>これまでの軌跡と成長の記録</p>
+        <div class="sep"></div>
+
+        <div class="row">
+          <button class="btn primary" id="newEntry">🧭 新しい記録</button>
+          <button class="btn" id="export">⬇️ エクスポート</button>
+          <label class="btn" style="cursor:pointer">
+            ⬆️ インポート
+            <input type="file" id="import" accept="application/json" style="display:none" />
+          </label>
+          <button class="btn danger right" id="deleteAll">すべて削除</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="grid">
+          ${cards}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderTheory() {
+    return `
+      <section class="card">
+        <h2>理論（短く）</h2>
+        <p>
+          このツールは「意味生成サイクル」を、日々の運用に落とし込んだものです。<br/>
+          <b>行動は“結果”ではなく“応答の形態”</b>であり、意味は行動のあとに立ち上がります。
+        </p>
+
+        <div class="sep"></div>
+
+        <div class="grid">
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">自己校正する意味生成サイクル</h2>
+            <p>小さく回すほど、解釈（物語）と当為（しなければならない事柄）が自然に洗練されていきます。</p>
+          </div>
+
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">初期値非依存</h2>
+            <p>はじめの価値観や気分がどんな状態でも、「1%行動」によって回転が始まる設計です。</p>
+          </div>
+
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">可逆性の担保</h2>
+            <p>大きな決断を避け、微調整で航路復帰する。だから安全に続けられます。</p>
+          </div>
+
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">当為（しなければならない事柄）の洗練</h2>
+            <p>羅針盤（良心）への問いを通して「次に何を守りたいか」がクリアになっていきます。</p>
+          </div>
+
+          <div class="notice">
+            <b>臨床的な注意点について</b><br/>
+            本エンジンは、強い精神病性症状（幻覚・妄想など）がある場合、自己判断での運用は推奨されません。<br/>
+            精神的な症状がある場合は、専門家の治療・支援を優先し、安定後に「生活基盤の整備（A運用）」として補助的に用いることが安全です。
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  
+  function renderTraining() {
+    let today = '';
+    try { today = new Date().toISOString().slice(0,10); } catch { today = ''; }
+
+    return `
+      <section class="card">
+        <h2>🏋️ 訓練（ワーク入力）</h2>
+        <p class="muted">
+          この画面は、ワークブックの訓練を「フォーム化」したものです。入力内容はネット送信せず、端末内（localStorage）に保存されます。<br>
+          記録すると「📒 日誌」に入ります。
+        </p>
+        <div class="sep"></div>
+        <div class="muted">※重い訓練（最悪想定など）は、心身が安定しているときだけ・無理をしないでください。</div>
+      </section>
+
+      <details class="card" open>
+        <summary><b>第一の柱：自己超越 強化訓練</b></summary>
+        <div class="sep"></div>
+
+        <details class="card">
+          <summary>1.1 一日一善：利他的行動</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第一の柱" data-work="1.1 一日一善">
+            <div class="grid">
+              <div>
+                <label>日付</label>
+                <input type="date" name="日付" value="${today}">
+              </div>
+              <div>
+                <label>実践した利他的行動</label>
+                <input name="利他的行動" placeholder="例：席を譲った／声をかけた／小さな手助け">
+              </div>
+            </div>
+            <label>行動中の気持ち</label>
+            <textarea name="行動中の気持ち" rows="3" placeholder="例：最初は少し照れた／心が温かくなった"></textarea>
+            <label>得られた気づき</label>
+            <textarea name="得られた気づき" rows="3" placeholder="例：意識が自分の外に向くと、悩みが相対化した"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+        <details class="card">
+          <summary>1.2 自己超越思考訓練：自分以外のものを志向する</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第一の柱" data-work="1.2 自己超越思考訓練">
+            <label>私が心から貢献したい社会問題や大義は？</label>
+            <textarea name="大義" rows="3"></textarea>
+            <label>私が時間を忘れて没頭できる理想や価値観は？</label>
+            <textarea name="理想・価値観" rows="3"></textarea>
+            <label>私が守りたい／創造したい美しいものは？（自然・芸術・関係など）</label>
+            <textarea name="美しいもの" rows="3"></textarea>
+            <label>私の知識や経験は、誰か／何かのためにどう役立てられる？</label>
+            <textarea name="役立て方" rows="3"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+        <details class="card">
+          <summary>1.3 憧れの人物から学ぶ訓練</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第一の柱" data-work="1.3 憧れの人物">
+            <label>憧れの人物（1人）</label>
+            <input name="人物名" placeholder="例：身近な先輩／歴史上の人物／著者など">
+            <label>その人物の、どんな価値観・信念に惹かれる？</label>
+            <textarea name="惹かれる点" rows="3"></textarea>
+            <label>その人物が追求した「意味／使命」は何だと思う？</label>
+            <textarea name="意味・使命" rows="3"></textarea>
+            <label>困難な状況で、その人ならどう考えどう行動する？</label>
+            <textarea name="困難時の行動" rows="3"></textarea>
+            <label>自分の人生で実践したいこと（具体的に）</label>
+            <textarea name="実践したいこと" rows="3"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+      </details>
+
+      <details class="card">
+        <summary><b>第二の柱：意味発見 強化訓練</b></summary>
+        <div class="sep"></div>
+
+        <details class="card">
+          <summary>2.1 ジャーナリング：経験から「意味」を抽出</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第二の柱" data-work="2.1 ジャーナリング">
+            <label>今日（今週）の経験から学んだ、最も重要なことは？</label>
+            <textarea name="学び" rows="3"></textarea>
+            <label>最近の困難が、長期的にどんな成長や意味をもたらす可能性がある？</label>
+            <textarea name="困難の意味" rows="3"></textarea>
+            <label>最近の喜び／感動は、どんな価値を示している？</label>
+            <textarea name="喜びの価値" rows="3"></textarea>
+            <label>この経験にタイトルを付けるなら？</label>
+            <input name="タイトル" placeholder="例：『逆風の中の一歩』">
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+        <details class="card">
+          <summary>2.2 メタ認知的日誌：衝動と意味のあいだに「間」をつくる</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第二の柱" data-work="2.2 メタ認知的日誌（1回分）">
+            <label>状況：今どこで、何が起きている？</label>
+            <textarea name="状況" rows="2"></textarea>
+            <label>感情・身体感覚：いちばん強いもの</label>
+            <textarea name="感情・身体感覚" rows="2" placeholder="例：不安7/10、胸がざわざわ"></textarea>
+            <label>浮かんでいる考え・ストーリー</label>
+            <textarea name="考え・ストーリー" rows="2" placeholder="例：『どうせ無理だ』"></textarea>
+            <label>行動したくなる衝動／意味に適った選択</label>
+            <textarea name="衝動と選択" rows="3" placeholder="例：すぐ返信したい→5分置いて落ち着いて返す"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+        <details class="card">
+          <summary>2.4 感謝ジャーナル：今日の感謝3つ</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第二の柱" data-work="2.4 感謝ジャーナル">
+            <label>感謝①（なぜ価値がある？）</label>
+            <textarea name="感謝1" rows="2"></textarea>
+            <label>感謝②（なぜ価値がある？）</label>
+            <textarea name="感謝2" rows="2"></textarea>
+            <label>感謝③（なぜ価値がある？）</label>
+            <textarea name="感謝3" rows="2"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+      </details>
+
+      <details class="card">
+        <summary><b>第三の柱：態度価値／精神の筋力 強化訓練</b></summary>
+        <div class="sep"></div>
+
+        <details class="card">
+          <summary>50％勇気チャレンジ（小さなリスクを取る訓練）</summary>
+          <div class="sep"></div>
+          <div class="muted">※大きな人生決断には使わず、「小さな挑戦」で筋力を鍛えるためのワーク。</div>
+          <div class="sep"></div>
+          <form data-training data-pillar="第三の柱" data-work="50％勇気チャレンジ">
+            <label>チャレンジ内容（何をやってみる？）</label>
+            <textarea name="チャレンジ内容" rows="2"></textarea>
+            <label>意味のある一歩だと思う理由</label>
+            <textarea name="理由" rows="2"></textarea>
+            <label>成功確率（感覚でOK）</label>
+            <input name="成功確率" placeholder="例：50％前後">
+            <label>つながっている価値・当為（しなければならない事柄／Sollen）</label>
+            <textarea name="価値・当為" rows="2"></textarea>
+            <div class="sep"></div>
+            <label>実行後：結果（事実レベル）</label>
+            <textarea name="結果" rows="2"></textarea>
+            <label>最初に浮かんだ感情・評価</label>
+            <textarea name="感情・評価" rows="2"></textarea>
+            <label>事後的自由：学び／筋力がどう鍛えられた？</label>
+            <textarea name="事後的自由の再解釈" rows="3"></textarea>
+            <label>次の小さなチャレンジ案</label>
+            <textarea name="次の案" rows="2"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+        <details class="card">
+          <summary>3.1 ユーモアの訓練（状況から自分を引き離す）</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第三の柱" data-work="3.1 ユーモアの訓練">
+            <label>最近の小さな失敗／ストレス出来事</label>
+            <textarea name="出来事" rows="2"></textarea>
+            <label>それをコメディ映画のワンシーンとして見ると？（滑稽な点・皮肉な点）</label>
+            <textarea name="ユーモア視点" rows="3"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+
+<details class="card">
+  <summary>3.2 絶望的状況シミュレーション（態度変容）</summary>
+  <div class="sep"></div>
+  <div class="notice">
+    <b>警告：</b>この訓練は心に大きな負荷がかかる場合があります。ご自身の心身が安定している時に取り組み、過度なストレスを感じた場合は決して無理をせず、専門家への相談も検討してください。
+  </div>
+  <div class="sep"></div>
+  <div class="muted">
+    <b>狙い：</b>あえて最悪の状況を想像する「逆説的」アプローチを通して、極限状況でも失われない「態度価値」を見出し、精神的な免疫（耐性）を養います。暗闇を直視して、その中にさえ消えない光を見出すための“心の準備”です。
+  </div>
+  <div class="sep"></div>
+  <form data-training data-pillar="第三の柱" data-work="3.2 絶望的状況シミュレーション">
+    <label>日付</label>
+    <input type="date" name="日付" value="${today}">
+    <label>テーマ（最悪の想定）</label>
+    <textarea name="テーマ" rows="2">もし自分が、仕事、財産、人間関係など、大切にしている全てを失ったら？</textarea>
+    <label>①その状況で、選べる「態度」は？（例：尊厳を保つ／希望を捨てない／他者への優しさを忘れない…）</label>
+    <textarea name="態度" rows="3" placeholder="例：『不安の中でも、他者への礼節は守る』"></textarea>
+    <label>②その態度を選ぶこと自体に、どのような「意味」を見出せる？</label>
+    <textarea name="意味" rows="3" placeholder="例：『条件が崩れても、自分の核は守れる』"></textarea>
+    <label>③それでもなお残されている価値（創造価値／体験価値など）の可能性は？</label>
+    <textarea name="残る価値" rows="3" placeholder="例：『誰かを支える一言』『学び直し』『自然の美しさ』"></textarea>
+    <label>今の自分への一言（慈しみ・励まし）</label>
+    <textarea name="自分への一言" rows="2" placeholder="例：『ゆっくりでいい。今日できる1%から』"></textarea>
+    <label>中止サイン（体の反応）※出たら中断</label>
+    <textarea name="中止サイン（体の反応）" rows="2" placeholder="例：動悸／呼吸が浅い／頭痛／吐き気／涙が止まらない／手が震える…"></textarea>
+    <label>現実での1%行動（備え）※“着地”のための小さな一歩</label>
+    <textarea name="現実での1%行動（備え）" rows="2" placeholder="例：信頼できる人に連絡／休息を確保／相談先メモ作成／家計の見直し5分…"></textarea>
+    <div class="muted">※中止サインが出たら、深呼吸→水分補給→安全な活動へ切り替え。必要なら専門家に相談。</div>
+    <div class="sep"></div>
+    <button class="btn primary" type="submit">📒 日誌に記録</button>
+  </form>
+</details>
+
+        <details class="card">
+          <summary>3.3 価値の相対化（依存を手放す）</summary>
+          <div class="sep"></div>
+          <form data-training data-pillar="第三の柱" data-work="3.3 価値の相対化">
+            <label>「これだけは失いたくない」価値①</label>
+            <input name="絶対価値1">
+            <label>価値②</label>
+            <input name="絶対価値2">
+            <label>価値③</label>
+            <input name="絶対価値3">
+            <label>そのうち1つを失ったと仮定したとき、なお見出しうる他の意味／価値は？</label>
+            <textarea name="代替の意味・価値" rows="3"></textarea>
+            <div class="sep"></div>
+            <button class="btn primary" type="submit">📒 日誌に記録</button>
+          </form>
+        </details>
+      </details>
+
+      <details class="card" open>
+        <summary><b>🏢 職場向け（個人で使う）超精密テンプレ：業種×職種×KPI/リスク</b></summary>
+        <div class="sep"></div>
+        <div class="muted">
+          「企業導入版」で使っている発想を、<b>個人の職場運用</b>に落とし込んだフォームです。<br/>
+          目的は“評価”ではなく、<b>KPIを「守る対象（価値）」へ翻訳して、精神の筋力（態度価値）で回す</b>ことです。
+        </div>
+        <div class="sep"></div>
+
+        <div class="grid">
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">① 職場プロファイル（保存されます）</h2>
+            <div class="grid">
+              <div>
+                <label>組織名（任意）</label>
+                <input id="wpOrg" placeholder="例：〇〇株式会社（任意）" value="${esc(state.workProfile.orgName)}">
+              </div>
+              <div class="row" style="gap:10px">
+                <div style="flex:1;min-width:200px">
+                  <label>業種</label>
+                  <select id="wpIndustry">
+                    <option value="">（選択）</option>
+                    ${INDUSTRIES.map(x=>`<option value="${esc(x)}" ${state.workProfile.industry===x?'selected':''}>${esc(x)}</option>`).join('')}
+                  </select>
+                </div>
+                <div style="flex:1;min-width:200px">
+                  <label>職種</label>
+                  <select id="wpJob">
+                    <option value="">（選択）</option>
+                    ${JOB_FUNCTIONS.map(x=>`<option value="${esc(x)}" ${state.workProfile.jobFunction===x?'selected':''}>${esc(x)}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+              <div class="row" style="gap:10px">
+                <div style="flex:1;min-width:200px">
+                  <label>部署（任意）</label>
+                  <input id="wpDept" placeholder="例：営業部/開発部…" value="${esc(state.workProfile.department)}">
+                </div>
+                <div style="flex:1;min-width:200px">
+                  <label>役割（任意）</label>
+                  <input id="wpRole" placeholder="例：リーダー/担当…" value="${esc(state.workProfile.role)}">
+                </div>
+              </div>
+
+              <div>
+                <label>利用者区分（訓練モード）</label>
+                <div class="row" style="gap:10px;flex-wrap:wrap">
+                  <span class="chip ${state.workProfile.userTier==='auto'?'active':''}" data-user-tier="auto">自動（役割から推定）</span>
+                  <span class="chip ${state.workProfile.userTier==='general'?'active':''}" data-user-tier="general">一般</span>
+                  <span class="chip ${state.workProfile.userTier==='manager'?'active':''}" data-user-tier="manager">管理者</span>
+                  <span class="chip ${state.workProfile.userTier==='executive'?'active':''}" data-user-tier="executive">役職者</span>
+                </div>
+                <div class="muted" style="margin-top:6px">
+                  現在の適用：<b>${esc(userTierLabel(resolveUserTier()))}</b>
+                  ${state.workProfile.userTier==='auto' ? `<span class="muted">（役割：${esc(state.workProfile.role||'未入力')} から推定）</span>` : ''}
+                </div>
+              </div>
+
+              <div class="row" style="justify-content:space-between;align-items:flex-end">
+                <div style="flex:1;min-width:240px">
+                  <label>KPI（1行1項目・編集可）</label>
+                  <textarea id="wpKpi" rows="4" placeholder="例：売上\n受注率\nCSAT…">${esc(state.workProfile.kpiText)}</textarea>
+                </div>
+                <div style="flex:1;min-width:240px">
+                  <label>主要リスク（1行1項目・編集可）</label>
+                  <textarea id="wpRisk" rows="4" placeholder="例：炎上\n情報漏えい\n過労…">${esc(state.workProfile.riskText)}</textarea>
+                </div>
+              </div>
+
+              <div class="row">
+                <button class="btn green" id="wpSuggest">業種×職種からKPI/リスクを自動提案</button>
+                <button class="btn primary" id="wpSaveProfile">保存</button>
+              </div>
+
+              <div class="notice">
+                <b>ポイント：</b>ここで出したKPI/リスクは“点数”ではなく、<b>意味（守る対象）を明確にするための素材</b>です。
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:rgba(255,255,255,.03)">
+            <h2 style="font-size:16px;margin-bottom:6px">② 今日の職場ログ（KPIを意味へ翻訳して回す）</h2>
+
+            <form data-workplace data-work="日次職場ログ">
+              <div class="grid">
+                <div>
+                  <label>日付</label>
+                  <input type="date" name="日付" value="${today}">
+                </div>
+                <div>
+                  <label>状況（外側で起きていること）</label>
+                  <input name="状況" placeholder="例：商談が難航／クレーム対応／締め作業…" />
+                </div>
+              </div>
+
+              <div class="sep"></div>
+
+              <div class="notice">
+                <b>（1）KPI → 意味への翻訳</b><br/>
+                「このKPIを守ることは、誰の何を守ること？」<br/>
+                例：売上＝顧客の問題解決／雇用の維持／チームの誇り
+              </div>
+              <label>今日向き合ったKPI/期待（任意）</label>
+              <input name="KPI/期待" placeholder="例：受注率、CSAT、品質、不良率、納期…">
+              <label>そのKPIが“守っている対象（価値）”は？</label>
+              <textarea name="守る対象（価値）" rows="2" placeholder="例：顧客の安心／安全／信頼／尊厳…"></textarea>
+
+              <div class="sep"></div>
+
+              <div class="notice">
+                <b>（2）リスク → 境界線（安全装置）</b><br/>
+                「兆候が出たら“止まる・相談する”が正解」も含めて運用します。
+              </div>
+              <label>今日気になったリスク/兆候（任意）</label>
+              <textarea name="リスク/兆候" rows="2" placeholder="例：焦りで雑になる／感情が荒れる／疲労が強い…"></textarea>
+              <label>中止サイン（体・心）</label>
+              <input name="中止サイン" placeholder="例：動悸、涙が止まらない、判断が荒い…">
+
+              <div class="sep"></div>
+
+              <div class="notice">
+                <b>（3）三大訓練の“職場版”</b><br/>
+                自己超越（誰のために）／意味発見（学び）／態度価値（どう在るか）
+              </div>
+              <label>自己超越：今日は誰/何のために働く？</label>
+              <textarea name="自己超越（対象）" rows="2"></textarea>
+              <label>意味発見：今日の経験からの学び（意味）</label>
+              <textarea name="意味（学び）" rows="2"></textarea>
+              <label>態度価値：避けられない制約の中で、どんな態度を選ぶ？</label>
+              <textarea name="態度（選択）" rows="2"></textarea>
+
+              <div class="sep"></div>
+
+              <div class="notice"><b>（4）次の一手：1%行動 +（任意で）50%チャレンジ</b></div>
+              <label>1%行動（最小・安全・確実）</label>
+              <input name="1%行動" placeholder="例：返信を丁寧に1通／整理2分／相談メモ…">
+              <label>50%チャレンジ（任意）</label>
+              <input name="50%チャレンジ" placeholder="例：提案を1つ出す／相談する／断る…">
+              <label>事後的自由：この行動で筋力はどう鍛えられた？</label>
+              <textarea name="事後的自由（再解釈）" rows="2"></textarea>
+
+              <div class="sep"></div>
+
+              <button class="btn primary" type="submit">📒 日誌に記録（職場ログ）</button>
+            </form>
+
+            <div class="sep"></div>
+            <div class="muted">
+              <b>参考：</b>現在の提案KPI/リスク（プロファイルが未設定なら空です）<br/>
+              KPI：<span class="badge" id="wpKpiPreview">—</span><br/>
+              リスク：<span class="badge" id="wpRiskPreview">—</span>
+            </div>
+          </div>
+
+          <details class="card">
+            <summary><b>③ 利用者区分（一般/管理者/役職者）別 Q&amp;A</b></summary>
+            <div class="sep"></div>
+            <div class="muted">
+              現在の適用：<b>${esc(userTierLabel(resolveUserTier()))}</b>
+              ${state.workProfile.userTier==='auto' ? `<span class="muted">（役割：${esc(state.workProfile.role||'未入力')} から推定）</span>` : ''}
+            </div>
+            <div class="sep"></div>
+            <div class="grid">
+              ${renderTierFaqHtml()}
+            </div>
+          </details>
+
+          <details class="card">
+            <summary><b>④ 職種別Q&amp;A（職場版）</b></summary>
+            <div class="sep"></div>
+            <div class="muted">
+              役職者・専門職向けでも、<b>「評価に使わない」「心身の安全」</b>だけは明文化しておくと導入が滑らかです。
+            </div>
+            <div class="sep"></div>
+            <div class="grid">
+              <div class="card" style="background:rgba(255,255,255,.03)">
+                <b>Q. これ、業績評価の材料になりますか？</b><br/>
+                <span class="muted">A. 原則しません。ここは“意味と態度”の訓練ログであり、評価は別系統で扱うのが安全です。</span>
+              </div>
+              <div class="card" style="background:rgba(255,255,255,.03)">
+                <b>Q. KPIが強いプレッシャーになります。</b><br/>
+                <span class="muted">A. KPIを“点数”として握りしめず、「誰の何を守るためか」へ翻訳して負荷を下げます。必要なら上司/産業保健へ相談。</span>
+              </div>
+              <div class="card" style="background:rgba(255,255,255,.03)">
+                <b>Q. リスクばかり考えて不安になります。</b><br/>
+                <span class="muted">A. リスクは恐怖ではなく“境界線”。中止サインが出たら止まる、が正解です。</span>
+              </div>
+              <div class="card" style="background:rgba(255,255,255,.03)">
+                <b>Q. 忙しくて入力できません。</b><br/>
+                <span class="muted">A. 1分でOK。「状況→1%行動」だけでも回れば十分です。</span>
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+
+
+
+      <details class="card">
+        <summary><b>無理をしないためのQ&amp;A（抜粋）</b></summary>
+        <div class="sep"></div>
+        <div class="muted">
+          ・全部やらなくてOK。「これならやれそう」を1つだけ。<br>
+          ・しんどくなったら、深呼吸していったん中断。「今日はここまで」も訓練。<br>
+          ・治療中の場合は、主治医/カウンセラーに相談してから。<br>
+        </div>
+      </details>
+    `;
+  }
+
+function render() {
+    if (state.tab === 'home') view.innerHTML = renderHome();
+    if (state.tab === 'engine') view.innerHTML = renderEngine();
+    if (state.tab === 'history') view.innerHTML = renderHistory();
+    if (state.tab === 'training') view.innerHTML = renderTraining();
+    if (state.tab === 'theory') view.innerHTML = renderTheory();
+
+    wire();
+  }
+
+  function wire(){
+    // global tabs
+    $$('.tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+    // home handlers
+    const startEngine = $('#startEngine');
+    if (startEngine) startEngine.onclick = () => { setTab('engine'); };
+    const goHistory = $('#goHistory');
+    if (goHistory) goHistory.onclick = () => setTab('history');
+
+    // mode chips home
+    $$('[data-mode]').forEach(ch => ch.onclick = () => {
+      const m = ch.dataset.mode;
+      state.mode = m;
+      state.draft.mode = m;
+      persistDraft();
+      render();
+    });
+
+    // engine handlers
+    $$('[data-step]').forEach(b => b.onclick = () => setStep(Number(b.dataset.step)));
+
+    const prev = $('#prevStep');
+    if (prev) prev.onclick = () => setStep(state.step - 1);
+
+    const next = $('#nextStep');
+    if (next) next.onclick = () => setStep(state.step + 1);
+
+    const reset = $('#resetDraft');
+    if (reset) reset.onclick = () => { if(confirm('入力中の内容をリセットしますか？')) resetDraft(); render(); };
+
+    const okReady = $('#okReady');
+    if (okReady) okReady.onclick = () => setStep(1);
+
+    const fillNow = $('#fillNow');
+    if (fillNow) fillNow.onclick = () => { state.draft.date = nowJP(); persistDraft(); render(); };
+
+    $$('[data-mode2]').forEach(ch => ch.onclick = () => {
+      const m = ch.dataset.mode2;
+      state.mode = m;
+      state.draft.mode = m;
+      persistDraft(); render();
+    });
+
+    const dateInput = $('#dateInput');
+    if (dateInput) dateInput.oninput = (e) => { state.draft.date = e.target.value; persistDraft(); };
+
+    const ext = $('#ext');
+    if (ext) ext.oninput = (e) => { state.draft.externalFeedback = e.target.value; persistDraft(); };
+
+    const ref = $('#ref');
+    if (ref) ref.oninput = (e) => { state.draft.reflection = e.target.value; persistDraft(); };
+
+    $$('[data-wind]').forEach(ch => ch.onclick = () => {
+      state.draft.windType = ch.dataset.wind;
+      persistDraft(); render();
+    });
+
+    const wf = $('#windForce');
+    if (wf) wf.oninput = (e) => { state.draft.windForce = Number(e.target.value); persistDraft(); render(); };
+
+    $$('[data-q]').forEach(ch => ch.onclick = async () => {
+      const q = ch.dataset.q || '';
+      try { await navigator.clipboard.writeText(q); alert('質問をコピーしました'); }
+      catch { alert('コピーできませんでした。手で選択してコピーしてください。'); }
+    });
+
+    const comp = $('#comp');
+    if (comp) comp.oninput = (e) => { state.draft.compass = e.target.value; persistDraft(); };
+
+    const act = $('#act');
+    if (act) act.oninput = (e) => { state.draft.action1Percent = e.target.value; persistDraft(); };
+
+    const copyAction = $('#copyAction');
+    if (copyAction) copyAction.onclick = async () => {
+      const t = state.draft.action1Percent || '';
+      try { await navigator.clipboard.writeText(t); alert('コピーしました'); }
+      catch { alert('コピーできませんでした。'); }
+    };
+
+    const infb = $('#infb');
+    if (infb) infb.oninput = (e) => { state.draft.internalFeedback = e.target.value; persistDraft(); };
+
+    const nextTxt = $('#next');
+    if (nextTxt) nextTxt.oninput = (e) => { state.draft.nextStep = e.target.value; persistDraft(); };
+
+    const save = $('#saveLog');
+    if (save) save.onclick = saveLog;
+
+    // history
+    const startFromHistory = $('#startFromHistory');
+    if (startFromHistory) startFromHistory.onclick = () => setTab('engine');
+
+    const newEntry = $('#newEntry');
+    if (newEntry) newEntry.onclick = () => { setTab('engine'); };
+
+    const delAll = $('#deleteAll');
+    if (delAll) delAll.onclick = deleteAllLogs;
+
+    const exp = $('#export');
+    if (exp) exp.onclick = exportLogs;
+
+    const imp = $('#import');
+    if (imp) imp.onchange = (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) importLogs(f);
+      e.target.value = '';
+    };
+
+
+    // training handlers
+    // workplace profile (職場向け：個人用)
+    const wpOrg = $('#wpOrg');
+    if (wpOrg) wpOrg.oninput = (e) => { state.workProfile.orgName = e.target.value; persistProfile(); };
+
+    const wpIndustry = $('#wpIndustry');
+    if (wpIndustry) wpIndustry.onchange = (e) => { state.workProfile.industry = e.target.value; persistProfile(); render(); };
+
+    const wpJob = $('#wpJob');
+    if (wpJob) wpJob.onchange = (e) => { state.workProfile.jobFunction = e.target.value; persistProfile(); render(); };
+
+    const wpDept = $('#wpDept');
+    if (wpDept) wpDept.oninput = (e) => { state.workProfile.department = e.target.value; persistProfile(); };
+
+    const wpRole = $('#wpRole');
+    if (wpRole) wpRole.oninput = (e) => { state.workProfile.role = e.target.value; persistProfile(); };
+
+    // 利用者区分（訓練モード）
+    $$('[data-user-tier]').forEach(el => {
+      el.onclick = () => {
+        const t = el.getAttribute('data-user-tier') || 'auto';
+        state.workProfile.userTier = t;
+        persistProfile();
+        render();
+      };
+    });
+
+    const wpKpi = $('#wpKpi');
+    if (wpKpi) wpKpi.oninput = (e) => { state.workProfile.kpiText = e.target.value; persistProfile(); };
+
+    const wpRisk = $('#wpRisk');
+    if (wpRisk) wpRisk.oninput = (e) => { state.workProfile.riskText = e.target.value; persistProfile(); };
+
+    const wpSuggest = $('#wpSuggest');
+    if (wpSuggest) wpSuggest.onclick = () => {
+      const d = deriveKpiRisk(state.workProfile.industry, state.workProfile.jobFunction);
+      state.workProfile.kpiText = d.kpis.join('\n');
+      state.workProfile.riskText = d.risks.join('\n');
+      persistProfile();
+      render();
+    };
+
+    const wpSaveProfile = $('#wpSaveProfile');
+    if (wpSaveProfile) wpSaveProfile.onclick = () => { persistProfile(); alert('職場プロファイルを保存しました。'); };
+
+    // preview chips
+    const wpKpiPreview = $('#wpKpiPreview');
+    const wpRiskPreview = $('#wpRiskPreview');
+    if (wpKpiPreview || wpRiskPreview) {
+      const k = (state.workProfile.kpiText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,6);
+      const r = (state.workProfile.riskText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,6);
+      if (wpKpiPreview) wpKpiPreview.textContent = k.length ? k.join(' / ') : '—';
+      if (wpRiskPreview) wpRiskPreview.textContent = r.length ? r.join(' / ') : '—';
+    }
+
+    // workplace daily log
+    $$('form[data-workplace]').forEach(f => {
+      f.onsubmit = (e) => {
+        e.preventDefault();
+        const data = {};
+        Array.from(f.elements).forEach(el => {
+          if (!el || !el.name) return;
+          data[el.name] = (el.value || '').trim();
+        });
+        // 訓練モード（利用者区分）と職場プロファイルを付与（ログの再現性を高める）
+        const effTier = resolveUserTier();
+        data['利用者区分'] = userTierLabel(effTier) + (state.workProfile.userTier === 'auto' ? '（自動）' : '');
+        if (state.workProfile.industry) data['職場：業種'] = state.workProfile.industry;
+        if (state.workProfile.department) data['職場：部署'] = state.workProfile.department;
+        if (state.workProfile.role) data['職場：役割'] = state.workProfile.role;
+        if (state.workProfile.jobFunction) data['職場：職種'] = state.workProfile.jobFunction;
+
+        const id = String(Date.now());
+        const lines = Object.keys(data).filter(k => data[k]).map(k => `${k}：${data[k]}`);
+        const summary = data['1%行動'] || data['状況'] || lines[0] || '';
+        const entry = {
+          id,
+          type: 'workplace',
+          date: nowJP(),
+          work: f.dataset.work || '職場ログ',
+          orgName: state.workProfile.orgName || '',
+          industry: state.workProfile.industry || '',
+          department: state.workProfile.department || '',
+          role: state.workProfile.role || '',
+          jobFunction: state.workProfile.jobFunction || '',
+          kpis: (state.workProfile.kpiText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean),
+          risks: (state.workProfile.riskText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean),
+          summary,
+          body: [
+            `【職場プロファイル】`,
+            `組織名：${state.workProfile.orgName||'—'}`,
+            `業種：${state.workProfile.industry||'—'}`,
+            `職種：${state.workProfile.jobFunction||'—'}`,
+            `部署：${state.workProfile.department||'—'} / 役割：${state.workProfile.role||'—'}`,
+            `KPI：${((state.workProfile.kpiText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,8)).join(' / ') || '—'}`,
+            `リスク：${((state.workProfile.riskText||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,8)).join(' / ') || '—'}`,
+            ``,
+            `【今日のログ】`,
+            ...lines
+          ].join('\n'),
+          data
+        };
+        state.logs.unshift(entry);
+        persist();
+        alert('職場ログを日誌に記録しました。');
+        setTab('history');
+      };
+    });
+
+    $$('form[data-training]').forEach(f => {
+      f.onsubmit = (e) => {
+        e.preventDefault();
+        const pillar = f.dataset.pillar || '';
+        const work = f.dataset.work || '';
+        const data = {};
+        Array.from(f.elements).forEach(el => {
+          if (!el || !el.name) return;
+          data[el.name] = (el.value || '').trim();
+        });
+        // 訓練モード（利用者区分）と職場プロファイルを付与（ログの再現性を高める）
+        const effTier = resolveUserTier();
+        data['利用者区分'] = userTierLabel(effTier) + (state.workProfile.userTier === 'auto' ? '（自動）' : '');
+        if (state.workProfile.orgName) data['職場：会社'] = state.workProfile.orgName;
+        if (state.workProfile.industry) data['職場：業種'] = state.workProfile.industry;
+        if (state.workProfile.department) data['職場：部署'] = state.workProfile.department;
+        if (state.workProfile.role) data['職場：役割'] = state.workProfile.role;
+        if (state.workProfile.jobFunction) data['職場：職種'] = state.workProfile.jobFunction;
+
+        const id = String(Date.now());
+        const lines = Object.keys(data).filter(k => data[k]).map(k => `${k}：${data[k]}`);
+        const entry = {
+          id,
+          type: 'training',
+          date: nowJP(),
+          pillar,
+          work,
+          summary: lines[0] || '',
+          body: lines.join('\n'),
+          data
+        };
+        state.logs.unshift(entry);
+        persist();
+        alert('訓練を日誌に記録しました。');
+        setTab('history');
+      };
+    });
+
+    $$('[data-del]').forEach(b => b.onclick = () => deleteLog(b.dataset.del));
+  }
+
+  // init
+  load();
+  // set draft mode if missing
+  if (!state.draft.mode) state.draft.mode = state.mode;
+  // default date fill
+  if (!state.draft.date) state.draft.date = '';
+  render();
+
+})();
+</script>
+
+<script>
+(() => {
+  const banner = document.getElementById('installBanner');
+  const installBtn = document.getElementById('installBtn');
+  const helpBtn = document.getElementById('installHelpBtn');
+  const closeBtn = document.getElementById('installCloseBtn');
+  const msgEl = document.getElementById('installMsg');
+
+  // --- Service Worker registration (required for "installable" PWA on Android/Chrome)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        // console.log('SW registered');
+      } catch (e) {
+        // console.warn('SW failed', e);
+      }
+    });
+  }
+
+  // --- Install prompt (Chrome/Edge/Android)
+  let deferredPrompt = null;
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function showBanner(text, canInstall) {
+    if (!banner || isStandalone()) return;
+    banner.classList.remove('hidden');
+    if (text) msgEl.textContent = text;
+    installBtn.style.display = canInstall ? 'inline-block' : 'none';
+  }
+
+  function hideBanner() {
+    if (!banner) return;
+    banner.classList.add('hidden');
+  }
+
+  // iOS (Safari): no beforeinstallprompt
+  function isiOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+  function isSafari() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showBanner('📲 ホーム画面に追加できます（アプリのように起動）', true);
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    hideBanner();
+  });
+
+  if (helpBtn) helpBtn.addEventListener('click', () => {
+    if (isiOS() && isSafari()) {
+      alert('iPhone/iPad（Safari）:
+1) 共有ボタン（□↑）
+2)「ホーム画面に追加」
+3) 追加
+
+※iOSは「インストール」ボタンが出ません。');
+    } else {
+      alert('Android（Chrome/Edge）:
+1) 右上メニュー（︙）
+2)「アプリをインストール」または「ホーム画面に追加」
+3) 追加
+
+※このページはHTTPSで開く必要があります（localhost除く）。');
+    }
+  });
+
+  if (installBtn) installBtn.addEventListener('click', async () => {
+    try {
+      if (!deferredPrompt) {
+        showBanner('※この端末/ブラウザでは「インストール」ボタンが出ません。右上メニューから「ホーム画面に追加」をお試しください。', false);
+        return;
+      }
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice && choice.outcome !== 'accepted') {
+        // user dismissed
+      } else {
+        hideBanner();
+      }
+    } catch (e) {
+      // ignore
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', hideBanner);
+
+  // Initial banner hint for iOS (Safari)
+  setTimeout(() => {
+    if (isStandalone()) return;
+    if (isiOS() && isSafari()) {
+      showBanner('📲 iPhone/iPadは「共有」→「ホーム画面に追加」でアプリ化できます', false);
+    }
+  }, 1200);
+
+})();
+</script>
+</body>
+</html>
