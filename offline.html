@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>オフライン</title>
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#0f1a2e; --text:#e6edf7; --muted:#a9b7d0;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, var(--bg), #070b13 90%);
+      color: var(--text);
+      min-height:100vh;
+      padding: calc(24px + var(--safe-top)) calc(16px + var(--safe-right)) calc(24px + var(--safe-bottom)) calc(16px + var(--safe-left));
+    }
+    .card{
+      max-width: 720px;
+      margin: 0 auto;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(17,31,54,.65);
+      backdrop-filter: blur(10px);
+      padding: 18px 16px;
+    }
+    h1{font-size:18px;margin:0 0 8px}
+    p{margin:0 0 14px; color: var(--muted); line-height:1.5}
+    button{
+      min-height:44px; width:100%;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(90,163,255,.18);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📴 オフラインです</h1>
+    <p>一度オンラインで開いた後なら、このアプリは端末内に保存され、オフラインでも起動できます。</p>
+    <p>通信が戻ったら、下のボタンで再読み込みしてください。</p>
+    <button onclick="location.href='./index.html'">再読み込み</button>
+  </div>
+</body>
+</html>

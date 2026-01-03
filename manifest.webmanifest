@@ -2,7 +2,7 @@
   "name": "ロゴダイナミック実存主義 Life Navigation Toolkit",
   "short_name": "Life Navigation",
   "description": "LDE Life Navigation Toolkit（完全オフライン版）",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

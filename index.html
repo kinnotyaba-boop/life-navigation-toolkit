@@ -2,18 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#0b1220" />
+  <meta name="color-scheme" content="dark light" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Life Navigation" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
   <link rel="icon" href="icons/icon-192.png" />
+  <link rel="icon" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="icon" sizes="16x16" href="icons/favicon-16.png" />
 <title>ロゴダイナミック実存主義 Life Navigation Toolkit（完全オフライン版）</title>
   <style>
     :root{
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
       --bg:#0b1220;
       --panel:#0f1a2e;
       --card:#111f36;
@@ -28,6 +35,9 @@
       --r:18px;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
+    body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:contain;}
+    
     body{
       margin:0;
       font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
@@ -38,14 +48,14 @@
       min-height:100vh;
     }
     a{color:var(--accent)}
-    .wrap{max-width:980px;margin:0 auto;padding:18px 16px 90px}
+    .wrap{max-width:980px;margin:0 auto;padding:calc(18px + var(--safe-top)) calc(16px + var(--safe-right)) calc(90px + var(--safe-bottom)) calc(16px + var(--safe-left))}
     header{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:14px 16px;border:1px solid var(--line);border-radius:24px;
       background: rgba(17,31,54,.65);
       backdrop-filter: blur(10px);
       box-shadow: var(--shadow);
-      position:sticky;top:12px;z-index:10;
+      position:sticky;top:calc(12px + var(--safe-top));z-index:10;
     }
     .brand{display:flex;align-items:center;gap:12px}
     .logo{
@@ -250,7 +260,20 @@
       font-weight: 600;
     }
     .installBanner.hidden{display:none}
-</style>
+/* --- Mobile polish --- */
+@media (max-width: 720px){
+  .wrap{padding:calc(12px + var(--safe-top)) calc(12px + var(--safe-right)) calc(110px + var(--safe-bottom)) calc(12px + var(--safe-left))}
+  header{flex-direction:column;align-items:stretch}
+  .brand{gap:10px}
+  .logo{width:44px;height:44px;font-size:22px}
+  .title h1{font-size:18px;line-height:1.25;margin:0}
+  .title p{font-size:12px}
+  .pill{align-self:flex-start}
+  .grid{grid-template-columns:1fr !important}
+  .btn{min-height:44px}
+  input,select,textarea{font-size:16px}
+  .installBanner{left:calc(12px + var(--safe-left));right:calc(12px + var(--safe-right))}
+}</style>
 </head>
 <body>
   <div class="wrap">
@@ -262,7 +285,7 @@
           <p>完全オフライン版（ブラウザのみ・保存は端末内）</p>
         </div>
       </div>
-      <div class="pill" id="statusPill">🟢 オフライン動作</div>
+      <div class="pill" id="statusPill">⏳ オフライン準備中</div>
     </header>
 
     
@@ -271,7 +294,7 @@
         📲 このツールを <b>ホーム画面に追加</b> すると、アプリのように起動できます。
       </div>
       <div class="actions">
-        <button class="btn" id="installBtn" type="button">インストール</button>
+        <button class="btn" id="installBtn" type="button">ホーム画面に追加</button>
         <button class="btn secondary" id="installHelpBtn" type="button">手順</button>
         <button class="btn secondary" id="installCloseBtn" type="button">×</button>
       </div>
@@ -1789,13 +1812,32 @@ function render() {
   const helpBtn = document.getElementById('installHelpBtn');
   const closeBtn = document.getElementById('installCloseBtn');
   const msgEl = document.getElementById('installMsg');
+  const statusPill = document.getElementById('statusPill');
+  let offlineReady = false;
+
+  function setPill(text){ if(statusPill) statusPill.textContent = text; }
+  function updatePill(){
+    if(!offlineReady){ setPill('⏳ オフライン準備中'); return; }
+    if(navigator.onLine){ setPill('✅ オフライン準備完了'); }
+    else{ setPill('🟠 オフライン中'); }
+  }
+
 
   // --- Service Worker registration (required for "installable" PWA on Android/Chrome)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
-        await navigator.serviceWorker.register('./sw.js', { scope: './' });
-        // console.log('SW registered');
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        try {
+          await navigator.serviceWorker.ready;
+          offlineReady = true;
+          updatePill();
+        } catch (_) {}
+        // Listen for updates and refresh prompt
+        if (reg && reg.waiting) {
+          // new SW waiting
+        }
+        navigator.serviceWorker.addEventListener('controllerchange', () => { offlineReady = true; updatePill(); });
       } catch (e) {
         // console.warn('SW failed', e);
       }
@@ -1888,6 +1930,11 @@ function render() {
   }, 1200);
 
 })();
+
+
+  window.addEventListener('online', updatePill);
+  window.addEventListener('offline', updatePill);
+  updatePill();
 </script>
 </body>
 </html>
